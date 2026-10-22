@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import SceneCanvas from './components/canvas/SceneCanvas';
 import StoryOverlay from './components/StoryOverlay';
-import LoadingScreen from './components/LoadingScreen'; // <-- Πρόσθεσε αυτό
+import LoadingScreen from './components/LoadingScreen'; 
 import './index.css';
 
 export default function App() {

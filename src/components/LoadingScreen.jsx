@@ -7,11 +7,23 @@ import euroaviaLogo from '../assets/euroavia_logo_hangar26-preview.png';
 export default function LoadingScreen() {
   const { progress, active } = useProgress();
   const [hidden, setHidden] = useState(false);
-  const [fade, setFade] = useState(false); // Νέο state για να ελέγχουμε το CSS fade-out
+  const [fade, setFade] = useState(false); 
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
+  // 2. ΝΕΟ: Μετράει τον ελάχιστο τεχνητό χρόνο (π.χ. 2500ms = 2.5 δευτερόλεπτα)
   useEffect(() => {
-    // 2. Σωστές παρενθέσεις: Αν ΔΕΝ είναι active ΚΑΙ (είναι 100 Ή 0)
-    if (!active && (progress === 100 || progress === 0)) {
+    const minTimer = setTimeout(() => {
+      setMinTimeElapsed(true);
+    }, 2500); 
+
+    return () => clearTimeout(minTimer);
+  }, []);
+
+  // 3. ΕΝΗΜΕΡΩΜΕΝΟ: Κλείνει μόνο αν τελειώσουν τα assets ΚΑΙ περάσει ο χρόνος
+  useEffect(() => {
+    const isAssetLoadingDone = !active && (progress === 100 || progress === 0);
+
+    if (isAssetLoadingDone && minTimeElapsed) {
       setFade(true); // Ξεκινάει το animation εξαφάνισης
       
       const timer = setTimeout(() => {
@@ -20,17 +32,15 @@ export default function LoadingScreen() {
       
       return () => clearTimeout(timer);
     }
-  }, [active, progress]);
+  }, [active, progress, minTimeElapsed]); // Προστέθηκε το minTimeElapsed εδώ
 
   // Αν έχει τελειώσει το animation εξαφάνισης, το βγάζουμε τελείως από το DOM
   if (hidden) return null;
 
   return (
-    // 3. Η κλάση fade-out μπαίνει βάσει του state `fade`
     <div className={`loading-screen ${fade ? 'fade-out' : ''}`}>
       <div className="loading-content">
         
-        {/* Σωστή χρήση της εικόνας μέσω του import */}
         <img 
           src={euroaviaLogo} 
           alt="Euroavia Logo" 
