@@ -1,0 +1,501 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* =========================================
+   GLOBAL RESET & VARIABLES
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-deep: #090a0d;
+  --panel-bg: rgba(20, 22, 28, 0.48);
+  --panel-bg-hover: rgba(26, 29, 36, 0.62);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(255, 255, 255, 0.22);
+  --text-pure: #ffffff;
+  --text-body: #cfd3dc;
+  --text-dim: #7f8695;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Προσθήκη του scroll-snap-type στον γενικό container της σελίδας */
+html, body {
+  background-color: var(--bg-deep);
+  color: var(--text-pure);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  
+   
+}
+
+/* Προσθήκη του scroll-snap-align στα sections */
+.section {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding: 0 8vw;
+  
+  /* Ορίζει ότι η οθόνη θα κεντράρει ακριβώς στη μέση αυτού του section */
+  scroll-snap-align: center;
+  
+  /* Εμποδίζει τον χρήστη να προσπεράσει τμήματα αν κάνει πολύ γρήγορο scroll */
+  scroll-snap-stop: always; 
+}
+
+/* =========================================
+   CUSTOM SCROLLBAR
+   ========================================= */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* =========================================
+   APP LAYOUT & 3D WRAPPER
+   ========================================= */
+.canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%, #1c212d 0%, var(--bg-deep) 85%);
+}
+
+.ui-layer {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.interactive {
+  pointer-events: auto;
+}
+
+.section {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding: 0 8vw;
+}
+
+.section.right {
+  justify-content: flex-end;
+}
+
+.section.center {
+  justify-content: center;
+  text-align: center;
+}
+
+/* =========================================
+   NAVBAR & HEADER
+   ========================================= */
+.navbar {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* Αφήνει κενό δεξιά και αριστερά. Προαιρετικά ορίζεις και ένα μέγιστο πλάτος. */
+  width: calc(100% - 4rem);
+  max-width: 1400px;
+  
+  padding: 1.2rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 20;
+
+  /* ΒΑΣΙΚΗ ΚΑΤΑΣΤΑΣΗ: Ρεαλιστικό φωτεινό γυαλί */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  
+  /* Πλήρες περίγραμμα και στρογγυλεμένες γωνίες */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  
+  /* Πιο έντονη σκιά για να τονιστεί η αιώρηση πάνω από τον 3D καμβά */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+
+  /* Προσθήκη transition για ομαλή εμφάνιση/απόκρυψη */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+
+  
+}
+
+.navbar:hover {
+  /* Διατηρούμε το κεντράρισμα και προσθέτουμε 2% μεγέθυνση */
+  transform: translateX(-50%) scale(1.02);
+  
+  /* Κάνουμε το γυαλί ελαφρώς πιο "γεμάτο" χρωματικά για να τονιστεί το focus */
+  background: rgba(9, 10, 13, 0.85);
+  
+  /* Αυξάνουμε τη σκιά για να φαίνεται ότι το navbar έρχεται πιο κοντά στον χρήστη */
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-hidden{
+  /* Το μετακινεί προς τα πάνω. Διατηρούμε το translateX(-50%) για να παραμείνει στο κέντρο */
+  transform: translate(-50%, -150%);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.88rem;
+  letter-spacing: 0.12em;
+  color: var(--text-pure);
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+  border-radius: 50%;
+  opacity: 0.85;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+/* =========================================
+   HIGH-END MINIMAL BUTTON (CAD TOGGLE)
+   ========================================= */
+.xray-btn {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  padding: 0.65rem 1.3rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  border-color: rgba(255, 255, 255, 0.4); /* Πιο φωτεινό περίγραμμα */
+  background: rgba(9, 10, 13, 0.65);
+  backdrop-filter: blur(10px);
+  color: var(--text-body);
+  box-shadow: 
+    0 0 20px rgba(255, 255, 255, 0.15),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
+  /* Κάνει την ίδια τη γραμματοσειρά να φωσφορίζει ελαφρώς */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.xray-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--border-active);
+  color: var(--text-pure);
+}
+
+.xray-btn.active {
+  background: #ffffff;
+  color: var(--bg-deep);
+  border-color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+}
+
+/* =========================================
+   FROSTED GLASS CARDS & SCROLL TRANSITIONS
+   ========================================= */
+.card {
+  max-width: 460px;
+  border-radius: 16px;
+  padding: 2.2rem 2.2rem;
+  cursor: pointer;
+  
+  /* ΒΑΣΙΚΗ ΚΑΤΑΣΤΑΣΗ: Ρεαλιστικό φωτεινό γυαλί */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  
+  /* Φωτεινές αντανακλάσεις στις άκρες */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* 3D Βάθος και εσωτερική λάμψη */
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.55),
+              inset 0 0 12px rgba(255, 255, 255, 0.05);
+              
+  /* Ενοποιημένο transition για smooth scroll-pop και hover */
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+  /* HOVER ΚΑΤΑΣΤΑΣΗ: Dark Glassmorphism HUD */
+  background: var(--panel-bg-hover);
+  
+  /* Αφαιρούμε τις φωτεινές αντανακλάσεις και κρατάμε ένα αμυδρό περίγραμμα */
+  border: 1px solid var(--border-active);
+  
+  /* Αυξάνουμε λίγο τη σκιά για αίσθηση ανύψωσης, χωρίς την εσωτερική λάμψη */
+  box-shadow: 0 45px 85px rgba(0, 0, 0, 0.7);
+  
+  /* Scale up 2% */
+  transform: translateY(0px) scale(1.02);
+}
+
+.card-pop-hidden {
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.card-pop-active {
+  opacity: 1;
+  transform: translateY(0px) scale(1);
+  filter: blur(0px);
+  pointer-events: auto;
+}
+
+/* =========================================
+   TYPOGRAPHY INSIDE CARDS
+   ========================================= */
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-dim);
+  margin-bottom: 0.85rem;
+  display: block;
+}
+
+.card h1, .card h2 {
+  font-size: 1.65rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.9rem;
+  color: var(--text-pure);
+}
+
+.card p {
+  color: var(--text-body);
+  line-height: 1.65;
+  font-size: 0.92rem;
+  font-weight: 300;
+  margin-bottom: 1.6rem;
+}
+
+/* =========================================
+   SPECS METRICS GRID
+   ========================================= */
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1.25rem;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono);
+}
+
+.spec-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.spec-val {
+  font-size: 0.95rem;
+  color: var(--text-pure);
+  font-weight: 500;
+}
+
+/* =========================================
+   3D CALLOUT HUD LABELS (THREE.JS BADGES)
+   ========================================= */
+.hud-label.active-hud {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(15, 17, 22, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: var(--text-pure);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: hudPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hud-label.active-hud span {
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+@keyframes hudPop {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* =========================================
+   MINIMAL LOADING SCREEN (FROSTED & CLEAN)
+   ========================================= */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-deep);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+}
+
+.loading-screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 260px;
+}
+
+.loading-logo {
+  width: 130px;
+  margin-bottom: 35px;
+  filter: brightness(0) invert(1);
+  opacity: 1; /* Από 0.95 σε 1 για πλήρη καθαρότητα */
+  transition: transform 0.4s ease;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 2px;
+  /* Ελαφρώς πιο φωτεινό λευκό border/track ώστε να ξεχωρίζει σε σκούρο γκρι */
+  background-color: rgba(255, 255, 255, 0.2);
+  margin-bottom: 14px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #ffffff;
+  /* Ενίσχυση του glow σε καθαρό λευκό */
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.85);
+  transition: width 0.25s ease-out;
+}
+
+.loading-text {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  /* Αλλαγή από var(--text-dim) σε συμπαγές καθαρό λευκό */
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  opacity: 1;
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS (max-width: 768px)
+   ========================================= */
+@media (max-width: 768px) {
+  /* 1. Συμπίεση του Navbar */
+  .navbar {
+    width: calc(100% - 24px); /* Μικραίνει τα πλαϊνά κενά */
+    top: 12px;
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+  }
+  
+  .brand {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+  
+  /* 2. Προσαρμογή του κουμπιού (μικρότερο padding) */
+  .xray-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.65rem;
+  }
+
+  .section, .section.right, .section.center {
+    align-items: flex-end !important;
+    padding-bottom: 2vh; /* Ελάχιστο κενό από το κάτω όριο της οθόνης */
+  }
+
+  /* Συμπίεση της κάρτας και προσθήκη εσωτερικού scroll αν χρειαστεί */
+  .card {
+    padding: 1rem;
+    max-height: 40vh; /* Αφήνει το 60% της οθόνης ελεύθερο για το 3D μοντέλο */
+    overflow-y: auto; /* Αν το κείμενο περισσεύει, θα σκρολάρει μέσα στην κάρτα */
+    background: rgba(15, 23, 42, 0.65); /* Ελαφρώς πιο διάφανο background */
+  }
+
+  /* 5. Σμίκρυνση της τυπογραφίας */
+  .card h1, .card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+  
+  .card p {
+    font-size: 0.85rem;
+    margin-bottom: 1.4rem;
+  }
+  
+  /* Προαιρετικά: Αν το κείμενο στο κουμπί είναι πολύ μεγάλο για mobile, 
+     κρύβουμε ένα μέρος του. */
+  .hide-on-mobile {
+    display: none;
+  }
+}
