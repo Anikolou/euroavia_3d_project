@@ -1,19 +1,32 @@
 import { Canvas } from '@react-three/fiber';
 import { Stars, Sparkles, Grid, ContactShadows } from '@react-three/drei';
 import EuroaviaUAV from './EuroaviaUAV';
-import { Suspense } from 'react';
+import { Suspense,useState, useEffect } from 'react';
 import useIsMobile from './isMobile';
 import CameraDebugger from './CameraDebugger';
 import './SceneCanvas.css';
+import { debugState } from './debugState';
 
 export default function SceneCanvas({ isXrayActive, setHovered, activeStep, setActiveStep }) {
   // Το custom hook αναλαμβάνει αυτόματα το state και το resize listener
   const isMobile = useIsMobile(768);
 
+  // State για να ξέρει ο Canvas πότε να δείξει τον CameraDebugger
+  const [isDebugActive, setIsDebugActive] = useState(debugState.isDebug);
+
+  useEffect(() => {
+    const unsubscribe = debugState.subscribe((status) => {
+      setIsDebugActive(status);
+    });
+    return unsubscribe;
+  }, []);
+
   return (
     <div className="canvas-container">
       <Canvas shadows camera={{ position: [0, 1.4, 6.2], fov: 45 }}>
-         {/* <CameraDebugger /> */}
+
+        {/* Ενεργοποιείται ΑΥΤΟΜΑΤΑ μόνο αν υπάρχει το ?debug=true στο URL */}
+        {isDebugActive && <CameraDebugger />}
 
         <fog attach="fog" args={['#0b0c0e', 10, 35]} />
 

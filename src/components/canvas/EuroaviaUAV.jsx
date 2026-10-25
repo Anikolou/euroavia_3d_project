@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect } from 'react';
+import React, { useRef, useLayoutEffect,useState,useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Float, Html } from '@react-three/drei';
 import useIsMobile from './isMobile';
@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {isLabelVisible} from './isLabelVisible';
+import { debugState } from './debugState';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -94,8 +95,26 @@ export default function EuroaviaUAV({ xrayMode, setHovered, activeStep, setActiv
   const { camera } = useThree();
   const camTarget = useRef(new THREE.Vector3(0, 0, 0));
 
-  useFrame((state, delta) => {
+  // State για το αν έχει παγώσει το περιβάλλον από το debug mode
+  const [isPaused, setIsPaused] = useState(debugState.isDebug);
 
+  // (Για το αριστερό φτερό) Φαίνεται κανονικά, ΕΚΤΟΣ αν είμαστε σε κινητό στο Explode (Step 1)
+  const showLeftHUD = isLabelVisible(isMobile, activeStep, 2) && !(isMobile && activeStep === 1);
+  
+  // (Για το δεξί φτερό) Φαίνεται ΑΠΟΚΛΕΙΣΤΙΚΑ σε κινητό στο Explode (Step 1)
+  const showRightHUD = isMobile && activeStep === 1;
+
+  useEffect(() => {
+    const unsubscribe = debugState.subscribe((status) => {
+      setIsPaused(status);
+    });
+    return unsubscribe;
+  }, []);
+
+  useFrame((state, delta) => {
+    // Αν το animation είναι paused, δεν εκτελείται τίποτα
+    if (isPaused)return; 
+    
     // 1. Περιστροφή έλικα
     if (propRef.current) {
       propRef.current.rotation.z += delta * 18;
@@ -125,22 +144,28 @@ export default function EuroaviaUAV({ xrayMode, setHovered, activeStep, setActiv
   });
 
   useLayoutEffect(() => {
-    // Επιλογή σετ συντεταγμένων ανάλογα με τη συσκευή
     const coords = isMobile ? CAM_COORDS.mobile : CAM_COORDS.desktop;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: '#scroll-wrapper',
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1.2,
-          onUpdate: (self) => {
-            const step = Math.min(5, Math.floor(self.progress * 6));
-            setActiveStep(step);
-          },
-        },
-      });
+      
+      // 🛠️ Αν είμαστε σε debug, αφήνουμε το timeline ελεύθερο. 
+      // Αλλιώς, του κοτσάρουμε κανονικά το ScrollTrigger.
+      const tl = gsap.timeline(
+        debugState.isDebug
+          ? {} 
+          : {
+              scrollTrigger: {
+                trigger: '#scroll-wrapper',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1.2,
+                onUpdate: (self) => {
+                  const step = Math.min(5, Math.floor(self.progress * 6));
+                  setActiveStep(step);
+                },
+              },
+            }
+      );
 
       // =========================================================
       // ΦΑΣΗ 1: ΠΛΗΡΗΣ ΑΠΟΔΟΜΗΣΗ (FULL EXPLODED VIEW)
@@ -187,6 +212,12 @@ export default function EuroaviaUAV({ xrayMode, setHovered, activeStep, setActiv
         // Κάμερα Φάσης 5
         .to(camera.position, { ...coords.step5.position, duration: 2 }, 8)
         .to(camTarget.current, { ...coords.step5.target, duration: 2 }, 8);
+
+        // 🛠️ ΤΟ ΜΑΓΙΚΟ ΚΟΛΠΟ ΓΙΑ ΤΟ DEBUG MODE ΕΔΩ:
+        if (debugState.isDebug) {
+          tl.pause(); // Αποσυνδέουμε το timeline από το αυτόματο scroll
+          tl.seek(activeStep * 2); // Πάμε κατευθείαν στον χρόνο που αντιστοιχεί στο Step!
+        }
     });
 
     return () => ctx.revert();
@@ -263,21 +294,23 @@ export default function EuroaviaUAV({ xrayMode, setHovered, activeStep, setActiv
           ))}
           
           <Html position={[-2.1, 0.4, 0.1]} center distanceFactor={6}>
+
             <div 
-              className={`hud-label ${isLabelVisible(isMobile, activeStep, 2) ? 'active-hud' : ''}`}
+              className={`hud-label ${showLeftHUD ? 'active-hud' : ''}`}
               style={{
-                opacity: isLabelVisible(isMobile, activeStep, 2) ? 1 : 0,
-                pointerEvents: isLabelVisible(isMobile, activeStep, 2) ? 'auto' : 'none',
+                opacity: showLeftHUD ? 1 : 0,
+                pointerEvents: showLeftHUD ? 'auto' : 'none',
                 transition: 'opacity 0.4s ease-in-out'
               }}
             >
               <strong>PORT HIGH-LIFT WING</strong>
               <span>Laser-Cut Ribs & Carbon Spar</span>
             </div>
+
           </Html>
         </group>
 
-        {/* RIGHT WING (Δεν είχε HTML label στον κώδικά σου, παραμένει ίδιο) */}
+        {/* RIGHT WING */}
         <group ref={wingRightRef}>
           <mesh position={[1.85, 0.05, 0.1]} rotation={[0, 0.12, 0]} castShadow>
             <boxGeometry args={[3.1, 0.06, 0.75]} />
@@ -287,6 +320,21 @@ export default function EuroaviaUAV({ xrayMode, setHovered, activeStep, setActiv
           {[0.8, 1.4, 2.0, 2.6].map((xPos, idx) => (
             <mesh key={idx} position={[xPos, 0.05, 0.1]} rotation={[0, 0.12, 0]}><boxGeometry args={[0.03, 0.08, 0.72]} /><meshBasicMaterial color="#38bdf8" wireframe /></mesh>
           ))}
+
+          {/* Νέο HTML Label για το δεξί φτερό (Starboard) */}
+          <Html position={[2.1, 0.4, 0.1]} center distanceFactor={6}>
+            <div 
+              className={`hud-label ${showRightHUD ? 'active-hud' : ''}`}
+              style={{
+                opacity: showRightHUD ? 1 : 0,
+                pointerEvents: showRightHUD ? 'auto' : 'none',
+                transition: 'opacity 0.4s ease-in-out'
+              }}
+            >
+              <strong>STARBOARD HIGH-LIFT WING</strong>
+              <span>Laser-Cut Ribs & Carbon Spar</span>
+            </div>
+          </Html>
         </group>
 
         {/* TAIL ASSEMBLY */}

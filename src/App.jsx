@@ -4,11 +4,14 @@ import SceneCanvas from './components/canvas/SceneCanvas';
 import StoryOverlay from './components/StoryOverlay';
 import LoadingScreen from './components/LoadingScreen'; 
 import './index.css';
+import { debugState } from './components/canvas/debugState';
 
 export default function App() {
   const [xrayToggle, setXrayToggle] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
+  
+  {/*Διαλέγουμε την κατάσταση στην οποία θέλουμε τον cameraDebugger πειράζοντας την αρχική κατάσταση στην φορτώνει το site*/}
+  const [activeStep, setActiveStep] = useState(debugState.initialStep);
 
   const isXrayActive = xrayToggle || hovered;
 
