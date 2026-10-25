@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useProgress } from '@react-three/drei';
+import './LoadingScreen.css'; 
 
 // 1. Κάνουμε import την εικόνα από τον φάκελο assets (Προσάρμοσε τα '../' ανάλογα με το πού είναι το LoadingScreen.jsx)
 import euroaviaLogo from '../assets/euroavia_logo_hangar26-preview.png';

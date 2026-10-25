@@ -1,0 +1,72 @@
+.canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%, #1c212d 0%, var(--bg-deep) 85%);
+}
+
+/* =========================================
+   3D CALLOUT HUD LABELS (THREE.JS BADGES)
+   ========================================= */
+
+.hud-label {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.hud-label.active-hud {
+  visibility: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(15, 17, 22, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: var(--text-pure);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: hudPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hud-label.active-hud span {
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+@keyframes hudPop {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS (HUD LABELS)
+   ========================================= */
+@media (max-width: 768px) {
+  .hud-label.active-hud {
+    padding: 6px 10px;
+    font-size: 10px;
+    border-radius: 6px;
+    gap: 2px;
+  }
+
+  .hud-label.active-hud span {
+    font-size: 8px;
+  }
+}

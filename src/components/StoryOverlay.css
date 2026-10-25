@@ -1,0 +1,170 @@
+/* =========================================
+   FROSTED GLASS CARDS & SCROLL TRANSITIONS
+   ========================================= */
+.card {
+  max-width: 460px;
+  border-radius: 16px;
+  padding: 2.2rem 2.2rem;
+  cursor: pointer;
+  
+  /* ΒΑΣΙΚΗ ΚΑΤΑΣΤΑΣΗ: Ρεαλιστικό φωτεινό γυαλί */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  
+  /* Φωτεινές αντανακλάσεις στις άκρες */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* 3D Βάθος και εσωτερική λάμψη */
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.55),
+              inset 0 0 12px rgba(255, 255, 255, 0.05);
+              
+  /* Ενοποιημένο transition για smooth scroll-pop και hover */
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+  /* HOVER ΚΑΤΑΣΤΑΣΗ: Dark Glassmorphism HUD */
+  background: var(--panel-bg-hover);
+  
+  /* Αφαιρούμε τις φωτεινές αντανακλάσεις και κρατάμε ένα αμυδρό περίγραμμα */
+  border: 1px solid var(--border-active);
+  
+  /* Αυξάνουμε λίγο τη σκιά για αίσθηση ανύψωσης, χωρίς την εσωτερική λάμψη */
+  box-shadow: 0 45px 85px rgba(0, 0, 0, 0.7);
+  
+  /* Scale up 2% */
+  transform: translateY(0px) scale(1.02);
+}
+
+.card-pop-hidden {
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.card-pop-active {
+  opacity: 1;
+  transform: translateY(0px) scale(1);
+  filter: blur(0px);
+  pointer-events: auto;
+}
+
+/* =========================================
+   TYPOGRAPHY INSIDE CARDS
+   ========================================= */
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-dim);
+  margin-bottom: 0.85rem;
+  display: block;
+}
+
+.card h1, .card h2 {
+  font-size: 1.65rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.9rem;
+  color: var(--text-pure);
+}
+
+.card p {
+  color: var(--text-body);
+  line-height: 1.65;
+  font-size: 0.92rem;
+  font-weight: 300;
+  margin-bottom: 1.6rem;
+}
+
+/* =========================================
+   SPECS METRICS GRID
+   ========================================= */
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1.25rem;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono);
+}
+
+.spec-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.spec-val {
+  font-size: 0.95rem;
+  color: var(--text-pure);
+  font-weight: 500;
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVENESS (CARDS)
+   ========================================= */
+@media (max-width: 768px) {
+/* Συμπίεση της κάρτας και προσθήκη εσωτερικού scroll αν χρειαστεί */
+  .card {
+    padding: 1rem;
+    max-height: 40vh; /* Αφήνει το 60% της οθόνης ελεύθερο για το 3D μοντέλο */
+    overflow-y: auto; /* Αν το κείμενο περισσεύει, θα σκρολάρει μέσα στην κάρτα */
+    background: rgba(15, 23, 42, 0.65); /* Ελαφρώς πιο διάφανο background */
+  }
+
+
+  .tag {
+    font-size: 0.65rem;
+    margin-bottom: 0.6rem;
+  }
+
+  /*Σμίκρυνση της τυπογραφίας */
+  .card h1, .card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .card p {
+    font-size: 0.85rem;
+    margin-bottom: 1.4rem;
+  }
+
+  /* Specs Metrics Grid */
+  .specs-grid {
+    gap: 0.75rem;
+    padding-top: 1rem;
+  }
+
+  .spec-label {
+    font-size: 0.6rem;
+  }
+
+  .spec-val {
+    font-size: 0.85rem;
+  }
+
+  
+}
+
+/*.card {
+  display: none !important; /* Προσωρινή ρύθμιση για να κρύβεται η κάρτα έτσι ώστε να βρίσκουμε πιο εύκολα τις συντεταγμένες των αντικειμένων μέσα στο canvas 
+} */

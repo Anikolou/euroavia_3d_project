@@ -1,4 +1,5 @@
 import { SECTIONS_DATA } from '../data/sectionsData';
+import './StoryOverlay.css';
 
 export default function StoryOverlay({ activeStep }) {
   return (
